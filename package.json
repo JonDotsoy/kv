@@ -1,6 +1,8 @@
 {
   "name": "@jondotsoy/open-kv",
-  "version": "v0.1.0",
+  "version": "v0.1.1",
+  "description": "A JS memory to Set/Get, Queues and Pub/Sub solutions",
+  "license": "MIT",
   "module": "src/index.ts",
   "type": "module",
   "typesVersions": {
