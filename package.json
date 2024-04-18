@@ -1,5 +1,5 @@
 {
-  "name": "@jondoysoy/open-kv",
+  "name": "@jondotsoy/open-kv",
   "version": "v0.1.0",
   "module": "src/index.ts",
   "type": "module",
