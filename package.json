@@ -1,0 +1,38 @@
+{
+  "name": "@jondoysoy/open-kv",
+  "version": "v0.1.0",
+  "module": "src/index.ts",
+  "type": "module",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./lib/types/"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "require": "./lib/cjs/index.js",
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/esm/index.js",
+      "default": "./lib/esm/index.js"
+    }
+  },
+  "files": [
+    "./lib/"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prettier": "^3.2.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "ulid": "^2.3.0"
+  },
+  "scripts": {
+    "prepack": "make build",
+    "fmt": "prettier -w ."
+  }
+}

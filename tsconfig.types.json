@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "module": "ESNext",
+    "allowImportingTsExtensions": false,
+    "moduleResolution": "Bundler",
+    "declaration": true,
+    "sourceMap": true,
+    "rootDir": "./src/"
+  },
+  "exclude": ["**/*.spec.ts", "node_modules", "lib"]
+}
