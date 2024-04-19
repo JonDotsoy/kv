@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.base-build.json",
   "compilerOptions": {
     "noEmit": false,
     "emitDeclarationOnly": false,
@@ -9,6 +9,5 @@
     "declaration": true,
     "inlineSourceMap": true,
     "rootDir": "./src/"
-  },
-  "exclude": ["**/*.spec.ts", "node_modules", "lib"]
+  }
 }

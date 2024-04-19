@@ -1,15 +1,15 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.base-build.json",
   "compilerOptions": {
+    "target": "ES2015",
     "noEmit": false,
     "emitDeclarationOnly": false,
-    "module": "NodeNext",
+    "module": "CommonJS",
     "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false,
     "declaration": true,
     "inlineSourceMap": true,
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "rootDir": "./src/"
-  },
-  "exclude": ["**/*.spec.ts", "node_modules", "lib"]
+  }
 }
