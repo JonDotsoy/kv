@@ -4,7 +4,7 @@ import type {
 } from "../manager-databases/dtos/manager-database.js";
 import { Memory } from "../manager-databases/memory.js";
 
-class KV implements ManagerDatabase {
+class KV {
   constructor(private manager: ManagerDatabase) {}
 
   async [Symbol.asyncDispose]() {
@@ -38,8 +38,26 @@ class KV implements ManagerDatabase {
   publish(...args: Parameters<ManagerDatabase["publish"]>) {
     return this.manager.publish(...args);
   }
-  subscribe(...args: Parameters<ManagerDatabase["subscribe"]>) {
-    return this.manager.subscribe(...args);
+  async subscribe(...args: Parameters<ManagerDatabase["subscribe"]>) {
+    const signal = args[1]?.signal;
+    const abortController = new AbortController();
+    signal?.addEventListener("abort", (reason) => {
+      abortController.abort(reason);
+    });
+    const sub = await this.manager.subscribe(...args);
+    return {
+      ...sub,
+      async *[Symbol.asyncIterator]() {
+        let val;
+        while ((val = await sub.next())) {
+          if (val.done) break;
+          yield val.value;
+        }
+      },
+      async [Symbol.asyncDispose]() {
+        await sub.unsubscribe?.();
+      },
+    };
   }
 }
 

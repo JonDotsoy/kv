@@ -1,20 +1,14 @@
-import { test, expect, beforeAll } from "bun:test";
-import * as YAML from "yaml";
+import { test, beforeAll, afterAll, afterEach } from "bun:test";
 import { useWorkspace } from "use-workspace";
 import { useNpmPack } from "use-workspace/use-npm-pack";
-import { z } from "zod";
 import type { Workspace } from "use-workspace/use-workspace";
 import * as fs from "fs/promises";
+import { loadNodeVersions } from "./utils/load-node-versions";
+import { JSONFile } from "./utils/json-file";
 
-const cases = new URL("./e2e/cases/", import.meta.url);
+const casesLocation = new URL("./e2e/cases/", import.meta.url);
 
-const versions = z
-  .record(z.string())
-  .parse(
-    YAML.parse(
-      await Bun.file(new URL("versions.yaml", import.meta.url).pathname).text(),
-    ),
-  );
+const versions = await loadNodeVersions();
 
 let workspace: Workspace;
 
@@ -30,7 +24,7 @@ beforeAll(async () => {
   // console.log("🚀 ~ beforeAll ~ pack:", pack)
   workspace = await useWorkspace("tests", {
     cleanBefore: true,
-    template: cases,
+    template: casesLocation,
   });
   await workspace.exec({ cmd: ["npm", "init", "-y"], silent: true });
   await workspace.exec({
@@ -39,11 +33,28 @@ beforeAll(async () => {
   });
 });
 
-const fls = (await fs.readdir(cases)).sort();
+const fls = (await fs.readdir(casesLocation, { recursive: true }))
+  .sort()
+  .filter(
+    (file) =>
+      file.endsWith(".js") || file.endsWith(".cjs") || file.endsWith(".mjs"),
+  );
+
+const jsonFile = await JSONFile.of(
+  new URL("e2e.coverage.yaml", import.meta.url),
+);
+
+afterEach(async () => {
+  await jsonFile.save();
+});
+
 for (const [version, bin] of Object.entries(versions)) {
   for (const fl of fls) {
+    const p = ["cover", version, fl];
+
     test(`Evaluate ${fl} script on node ${version}`, async () => {
-      await workspace.exec({ cmd: [bin, fl] });
+      const childProcess = await workspace.exec({ cmd: [bin, fl] });
+      jsonFile.set(p, childProcess.exitCode === 0);
     });
   }
 }

@@ -1,0 +1,50 @@
+cover:
+  v10.24.1:
+    load_esm_module.mjs: false
+    load_require_module.cjs: true
+    open_kv.js: true
+    set_and_get_value.js: true
+    set_and_get_value.mjs: false
+    set_value.js: true
+  v11.15.0:
+    load_esm_module.mjs: false
+    load_require_module.cjs: true
+    open_kv.js: true
+    set_and_get_value.js: true
+    set_and_get_value.mjs: false
+    set_value.js: true
+  v16.20.2:
+    load_esm_module.mjs: true
+    load_require_module.cjs: true
+    open_kv.js: true
+    set_and_get_value.js: true
+    set_and_get_value.mjs: true
+    set_value.js: true
+  v18.17.0:
+    load_esm_module.mjs: true
+    load_require_module.cjs: true
+    open_kv.js: true
+    set_and_get_value.js: true
+    set_and_get_value.mjs: true
+    set_value.js: true
+  v20.10.0:
+    load_esm_module.mjs: true
+    load_require_module.cjs: true
+    open_kv.js: true
+    set_and_get_value.js: true
+    set_and_get_value.mjs: true
+    set_value.js: true
+  v21.4.0:
+    load_esm_module.mjs: true
+    load_require_module.cjs: true
+    open_kv.js: true
+    set_and_get_value.js: true
+    set_and_get_value.mjs: true
+    set_value.js: true
+  v21.7.3:
+    load_esm_module.mjs: true
+    load_require_module.cjs: true
+    open_kv.js: true
+    set_and_get_value.js: true
+    set_and_get_value.mjs: true
+    set_value.js: true
