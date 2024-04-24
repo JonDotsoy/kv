@@ -1,6 +1,6 @@
 # @jondotsoy/open-kv
 
-A JS memory to Set/Get, Queues and Pub/Sub solutions.
+A JS implementation to Set/Get, Queues and Pub/Sub solutions.
 
 **Example:**
 
@@ -32,3 +32,8 @@ for await (const message of kv.subscribe()) {
 await kv.publish("foo");
 await kv.publish("biz");
 ```
+
+## DB Supported
+
+- Memory
+- Redis
