@@ -1,13 +1,13 @@
 import { test, expect } from "bun:test";
 import { useWorkspace } from "use-workspace";
-import { JSONFile } from "./json-file";
+import { LFile, scanObject } from "./lfile";
 import * as fs from "fs/promises";
 
 test("get function", async () => {
   const workspace = await useWorkspace("json-file", { cleanBefore: true });
   const fileLocation = new URL("file.json", workspace.location);
 
-  const jsonFile = await JSONFile.of(fileLocation);
+  const jsonFile = await LFile.from(fileLocation);
 
   const value = jsonFile.get();
 
@@ -20,7 +20,7 @@ test("get function", async () => {
 
   await fs.writeFile(fileLocation, `{"foo":{"taz":3}}`);
 
-  const jsonFile = await JSONFile.of(fileLocation);
+  const jsonFile = await LFile.from(fileLocation);
 
   const value = jsonFile.get(["foo", "taz"]);
 
@@ -33,7 +33,7 @@ test("get function", async () => {
 
   await fs.writeFile(fileLocation, `{"foo":{"taz":3}}`);
 
-  const jsonFile = await JSONFile.of(fileLocation);
+  const jsonFile = await LFile.from(fileLocation);
 
   const value = jsonFile.get(["another", "taz"]);
 
@@ -46,7 +46,7 @@ test("get function", async () => {
 
   await fs.writeFile(fileLocation, `{"foo":{"taz":3}}`);
 
-  const jsonFile = await JSONFile.of(fileLocation);
+  const jsonFile = await LFile.from(fileLocation);
 
   const value = jsonFile.get(["foo"]);
 
@@ -57,7 +57,7 @@ test("call set function", async () => {
   const workspace = await useWorkspace("json-file", { cleanBefore: true });
   const fileLocation = new URL("file.json", workspace.location);
 
-  await using jsonFile = await JSONFile.of(fileLocation);
+  await using jsonFile = await LFile.from(fileLocation);
 
   jsonFile.set(["foo", "taz"], 3);
 

@@ -26,7 +26,7 @@ class Store {
     readonly id: string,
     readonly value: unknown,
     readonly expiration?: number,
-  ) {}
+  ) { }
 
   toString() {
     return JSON.stringify(this.value);
@@ -54,7 +54,7 @@ class Cleaner {
     timer: any;
   } = null;
 
-  constructor(private manager: ManagerDatabase) {}
+  constructor(private manager: ManagerDatabase) { }
 
   async clean() {
     const expirationsSorted = Array.from(this.expirations);
@@ -89,6 +89,34 @@ class Cleaner {
   }
 }
 
+export class Cron {
+  treeTimer: Record<number, () => unknown> = {}
+
+  add(timestamp: number, cb: () => unknown) {
+
+  }
+}
+
+export class MemoryStorage {
+  storage = new Map<string, unknown>()
+
+  set(key: string, value: unknown) {
+    this.storage.set(key, value)
+  }
+
+  delete(key: string) {
+    this.storage.delete(key)
+  }
+
+  /**
+   * @param key
+   * @param expirationAt
+   */
+  expireAt(key: string, expirationAt: number) {
+    
+  }
+}
+
 export class Memory implements ManagerDatabase {
   readonly channels = new Map<string, Set<string>>();
 
@@ -104,10 +132,10 @@ export class Memory implements ManagerDatabase {
     };
   }
 
-  async init() {}
-  async close() {}
+  async init() { }
+  async close() { }
 
-  private async expireAt(key: string, expiration: number) {}
+  private async expireAt(key: string, expiration: number) { }
 
   async set(key: string, value: unknown, options?: StoreOption): Promise<void> {
     await this.setInternal(key, value, options);
@@ -131,9 +159,6 @@ export class Memory implements ManagerDatabase {
 
   async deleteStore(store: Store): Promise<void> {
     this.store.delete(store.id);
-    // for (const index of Object.values(this.indexes)) {
-    //   await index.delete(store as any);
-    // }
   }
 
   async delete(key: string): Promise<void> {
@@ -206,12 +231,14 @@ export class Memory implements ManagerDatabase {
       abortController.abort(reason);
     });
     const isAborted = () => abortController.signal.aborted;
-    const roomId = `pubsub_messages:${channel}:room:${this.ulid()}`;
+    const roomId =
+      options?.subId ?? `pubsub_messages:${channel}:room:${this.ulid()}`;
     const idRooms = templateIdRooms(channel);
 
     await this.lPush(idRooms, roomId);
 
     const subscription: Subscription = {
+      subId: roomId,
       next: async (): Promise<{
         done?: boolean | undefined;
         value: unknown;
@@ -239,6 +266,7 @@ export class Memory implements ManagerDatabase {
       unsubscribe: async function (): Promise<void> {
         abortController.abort();
       },
+      [Symbol.asyncIterator]: () => subscription,
     };
 
     return subscription;

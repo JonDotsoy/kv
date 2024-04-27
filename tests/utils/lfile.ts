@@ -5,15 +5,78 @@ import * as YAML from "yaml";
 const isObject = (value: unknown): value is Record<any, any> =>
   typeof value === "object" && value !== null;
 
-export class JSONFile {
+const enum FileTypes {
+  json,
+  yaml,
+}
+
+const parsers: Record<
+  FileTypes,
+  {
+    serialize: (value: unknown) => string;
+    deserialize: (payload: string) => unknown;
+  }
+> = {
+  [FileTypes.json]: {
+    deserialize(payload) {
+      return JSON.parse(payload);
+    },
+    serialize(value) {
+      return JSON.stringify(value, null, 2);
+    },
+  },
+  [FileTypes.yaml]: {
+    deserialize(payload) {
+      return YAML.parse(payload);
+    },
+    serialize(value) {
+      return YAML.stringify(value);
+    },
+  },
+};
+
+const inferFileType = (pathname: string): FileTypes => {
+  const pathnameLowerCase = pathname.toLowerCase();
+  switch (true) {
+    case pathnameLowerCase.endsWith(".yml"):
+    case pathnameLowerCase.endsWith(".yaml"):
+      return FileTypes.yaml;
+    default:
+      return FileTypes.json;
+  }
+};
+
+export const scanObject = (
+  object: any,
+  routes = new WeakMap<WeakKey, PropertyKey[]>(),
+  route: string[] = [],
+) => {
+  if (isObject(object)) {
+    if (!routes.has(object)) {
+      routes.set(object, [...route]);
+    }
+    for (const part in object) {
+      scanObject(object[part], routes, [...route, part]);
+    }
+  }
+
+  return { object, routes };
+};
+
+class Obj {
+  constructor(readonly obj: any) {}
+
+  static from(value: any) {
+    return new Obj(value);
+  }
+}
+
+export class LFile {
   private body: any = undefined;
-  private format: "yaml" | "json" = "json";
+  private fileType: FileTypes = FileTypes.json;
 
   private constructor(readonly location: URL) {
-    this.format =
-      location.pathname.endsWith(".yaml") || location.pathname.endsWith(".yml")
-        ? "yaml"
-        : "json";
+    this.fileType = inferFileType(location.pathname);
   }
 
   async [Symbol.asyncDispose]() {
@@ -21,13 +84,11 @@ export class JSONFile {
   }
 
   private deserialize(payload: string) {
-    if (this.format === "yaml") return YAML.parse(payload);
-    return JSON.parse(payload);
+    return parsers[this.fileType].deserialize(payload);
   }
 
   private serialize(object: unknown) {
-    if (this.format === "yaml") return YAML.stringify(object);
-    return JSON.stringify(object, null, 2);
+    return parsers[this.fileType].serialize(object);
   }
 
   async save() {
@@ -52,6 +113,10 @@ export class JSONFile {
     Reflect.set(chunk.current, lastPath, value);
   }
 
+  delete(paths: PropertyKey[] = []) {
+    this.set(paths, undefined);
+  }
+
   get(paths: PropertyKey[] = []) {
     const chunk = { current: this.body };
     for (const path of paths) {
@@ -64,7 +129,7 @@ export class JSONFile {
     return chunk.current;
   }
 
-  async setup() {
+  async load() {
     const exists = await fs.exists(this.location);
     const isFile = exists ? (await fs.stat(this.location)).isFile() : false;
 
@@ -75,9 +140,9 @@ export class JSONFile {
     return this;
   }
 
-  static async of(location: { toString(): string }) {
-    return await new JSONFile(
+  static async from(location: { toString(): string }) {
+    return await new LFile(
       new URL(`${location}`, new URL(`${process.cwd()}/`, "file:")),
-    ).setup();
+    ).load();
   }
 }

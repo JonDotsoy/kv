@@ -67,19 +67,19 @@ export class ChannelBySeconds {
 class NamespaceKey {
   constructor(readonly namespace: string) {}
 
-  store(storeKey: string): string {
+  renderStore(storeKey: string): string {
     return `${this.namespace}:value:${storeKey}`;
   }
 
-  queue(queueKey: string): string {
+  renderQueue(queueKey: string): string {
     return `${this.namespace}:queues:${queueKey}`;
   }
 
-  room(roomKey: string): string {
+  renderRoom(roomKey: string): string {
     return `${this.namespace}:rooms:${roomKey}`;
   }
 
-  subscriptionQueue(subscriptionQueueKey: string): string {
+  renderSubscriptionQueue(subscriptionQueueKey: string): string {
     return `${this.namespace}:room:subs:${subscriptionQueueKey}`;
   }
 }
@@ -169,22 +169,22 @@ export class Redis implements ManagerDatabase {
     options?: StoreOptions | undefined,
   ): Promise<void> {
     await this.client.set(
-      this.namespaceKey.store(key),
+      this.namespaceKey.renderStore(key),
       JSON.stringify(value),
       {},
     );
     if (options?.ttl) {
       await this.client.expireAt(
-        this.namespaceKey.store(key),
+        this.namespaceKey.renderStore(key),
         Math.floor((Date.now() + options.ttl) / 1000),
       );
     }
   }
   async delete(key: string): Promise<void> {
-    await this.client.del(this.namespaceKey.store(key));
+    await this.client.del(this.namespaceKey.renderStore(key));
   }
   async get(key: string): Promise<unknown> {
-    const val = await this.client.get(this.namespaceKey.store(key));
+    const val = await this.client.get(this.namespaceKey.renderStore(key));
     if (val === null) return null;
     return JSON.parse(val);
   }
@@ -194,25 +194,25 @@ export class Redis implements ManagerDatabase {
     options?: StoreOptions | undefined,
   ): Promise<void> {
     await this.client.lPush(
-      this.namespaceKey.queue(channel),
+      this.namespaceKey.renderQueue(channel),
       JSON.stringify(value),
     );
     if (options?.ttl) {
       await this.client.expireAt(
-        this.namespaceKey.queue(channel),
+        this.namespaceKey.renderQueue(channel),
         Math.floor((Date.now() + options.ttl) / 1000),
       );
     }
   }
   async dequeue(channel: string, options?: {} | undefined): Promise<unknown> {
-    const val = await this.client.lPop(this.namespaceKey.queue(channel));
+    const val = await this.client.lPop(this.namespaceKey.renderQueue(channel));
     if (val === null) return null;
     return JSON.parse(val);
   }
 
   async publish(channel: string, value: unknown): Promise<void> {
     const self = this;
-    const roomKey = this.namespaceKey.room(channel);
+    const roomKey = this.namespaceKey.renderRoom(channel);
 
     const scanSubscriptionQueues = async function* () {
       let running = true;
@@ -256,10 +256,14 @@ export class Redis implements ManagerDatabase {
     const abortController = new AbortController();
     options?.signal.addEventListener("abort", () => abortController.abort());
     const isAborted = () => abortController.signal.aborted;
+    const subId = options?.subId ?? ulid();
 
-    const subscriptionQueueKey = this.namespaceKey.subscriptionQueue(ulid());
-    const roomKey = this.namespaceKey.room(channel);
-    this.client.sAdd(roomKey, subscriptionQueueKey);
+    const subscriptionQueueKey =
+      this.namespaceKey.renderSubscriptionQueue(subId);
+    const roomKey = this.namespaceKey.renderRoom(channel);
+
+    if (options?.subId !== subId)
+      await this.client.sAdd(roomKey, subscriptionQueueKey);
 
     const next = async () => {
       while (!isAborted()) {
@@ -276,12 +280,14 @@ export class Redis implements ManagerDatabase {
     };
 
     const subscription: Subscription = {
+      subId,
       next: () => next(),
       unsubscribe: async () => {
         await this.client.sRem(roomKey, subscriptionQueueKey);
         await this.client.del(subscriptionQueueKey);
         abortController.abort();
       },
+      [Symbol.asyncIterator]: () => subscription,
     };
 
     return subscription;

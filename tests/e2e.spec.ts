@@ -4,7 +4,9 @@ import { useNpmPack } from "use-workspace/use-npm-pack";
 import type { Workspace } from "use-workspace/use-workspace";
 import * as fs from "fs/promises";
 import { loadNodeVersions } from "./utils/load-node-versions";
-import { JSONFile } from "./utils/json-file";
+import { LFile } from "./utils/lfile";
+
+const e2eOn = process.env.TEST_E2E === "true";
 
 const casesLocation = new URL("./e2e/cases/", import.meta.url);
 
@@ -12,26 +14,27 @@ const versions = await loadNodeVersions();
 
 let workspace: Workspace;
 
-beforeAll(async () => {
-  const selfWorkspace = await useWorkspace(
-    new URL("../", import.meta.url).pathname,
-  );
-  const pack = await useNpmPack(selfWorkspace, [
-    "package.json",
-    "tsconfig.*.json",
-    "src/**/*",
-  ]);
-  // console.log("🚀 ~ beforeAll ~ pack:", pack)
-  workspace = await useWorkspace("tests", {
-    cleanBefore: true,
-    template: casesLocation,
+e2eOn &&
+  beforeAll(async () => {
+    const selfWorkspace = await useWorkspace(
+      new URL("../", import.meta.url).pathname,
+    );
+    const pack = await useNpmPack(selfWorkspace, [
+      "package.json",
+      "tsconfig.*.json",
+      "src/**/*",
+    ]);
+    // console.log("🚀 ~ beforeAll ~ pack:", pack)
+    workspace = await useWorkspace("tests", {
+      cleanBefore: true,
+      template: casesLocation,
+    });
+    await workspace.exec({ cmd: ["npm", "init", "-y"], silent: true });
+    await workspace.exec({
+      cmd: ["npm", "install", pack, "--omit=dev"],
+      silent: !true,
+    });
   });
-  await workspace.exec({ cmd: ["npm", "init", "-y"], silent: true });
-  await workspace.exec({
-    cmd: ["npm", "install", pack, "--omit=dev"],
-    silent: !true,
-  });
-});
 
 const fls = (await fs.readdir(casesLocation, { recursive: true }))
   .sort()
@@ -40,7 +43,7 @@ const fls = (await fs.readdir(casesLocation, { recursive: true }))
       file.endsWith(".js") || file.endsWith(".cjs") || file.endsWith(".mjs"),
   );
 
-const jsonFile = await JSONFile.of(
+const jsonFile = await LFile.from(
   new URL("e2e.coverage.yaml", import.meta.url),
 );
 
@@ -52,7 +55,7 @@ for (const [version, bin] of Object.entries(versions)) {
   for (const fl of fls) {
     const p = ["cover", version, fl];
 
-    test(`Evaluate ${fl} script on node ${version}`, async () => {
+    test.if(e2eOn)(`Evaluate ${fl} script on node ${version}`, async () => {
       const childProcess = await workspace.exec({ cmd: [bin, fl] });
       jsonFile.set(p, childProcess.exitCode === 0);
     });

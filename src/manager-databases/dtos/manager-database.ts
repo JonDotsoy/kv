@@ -1,8 +1,8 @@
 export type StoreOptions = { ttl?: number };
-export type SubscribeOptions = { signal: AbortSignal };
+export type SubscribeOptions = { subId?: string; signal: AbortSignal };
 
-export type Subscription = {
-  next: () => Promise<{ done?: boolean; value: unknown }>;
+export type Subscription = AsyncIterableIterator<unknown> & {
+  subId: string;
   unsubscribe?: () => Promise<void>;
 };
 
