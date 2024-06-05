@@ -1,8 +1,10 @@
-# @jondotsoy/open-kv
+# Open-KV: A JavaScript Implementation for Key-Value Store, Queues, and Pub/Sub Messaging
 
-A JS implementation to Set/Get, Queues and Pub/Sub solutions.
+Open-KV is an open-source library that provides a simple way to work with key-value stores, queues, and pub/sub messaging using JavaScript. It aims to provide a scalable and flexible solution for building distributed systems.
 
-**Example:**
+**Example Usage**
+
+Here's an example of how you can use Open-KV:
 
 ```ts
 import { open } from "@jondotsoy/open-kv";
@@ -17,7 +19,6 @@ await setTimeout(200);
 await kv.get("tar"); // => Error: Cannot found foo
 
 // Queue
-
 await kv.enqueue("foo");
 await kv.dequeue(); // => "foo"
 await kv.dequeue(); // => null
@@ -33,7 +34,11 @@ await kv.publish("foo");
 await kv.publish("biz");
 ```
 
-## DB Supported
+## Supported Databases
 
-- Memory
-- Redis
+Open-KV supports the following databases:
+
+- **Memory**: In-memory key-value store
+- **Redis**: A popular open-source in-memory data store
+
+With Open-KV, you can easily switch between these two databases depending on your use case and requirements.

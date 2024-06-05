@@ -26,7 +26,7 @@ class Store {
     readonly id: string,
     readonly value: unknown,
     readonly expiration?: number,
-  ) { }
+  ) {}
 
   toString() {
     return JSON.stringify(this.value);
@@ -54,7 +54,7 @@ class Cleaner {
     timer: any;
   } = null;
 
-  constructor(private manager: ManagerDatabase) { }
+  constructor(private manager: ManagerDatabase) {}
 
   async clean() {
     const expirationsSorted = Array.from(this.expirations);
@@ -90,31 +90,27 @@ class Cleaner {
 }
 
 export class Cron {
-  treeTimer: Record<number, () => unknown> = {}
+  treeTimer: Record<number, () => unknown> = {};
 
-  add(timestamp: number, cb: () => unknown) {
-
-  }
+  add(timestamp: number, cb: () => unknown) {}
 }
 
 export class MemoryStorage {
-  storage = new Map<string, unknown>()
+  storage = new Map<string, unknown>();
 
   set(key: string, value: unknown) {
-    this.storage.set(key, value)
+    this.storage.set(key, value);
   }
 
   delete(key: string) {
-    this.storage.delete(key)
+    this.storage.delete(key);
   }
 
   /**
    * @param key
    * @param expirationAt
    */
-  expireAt(key: string, expirationAt: number) {
-    
-  }
+  expireAt(key: string, expirationAt: number) {}
 }
 
 export class Memory implements ManagerDatabase {
@@ -132,10 +128,10 @@ export class Memory implements ManagerDatabase {
     };
   }
 
-  async init() { }
-  async close() { }
+  async init() {}
+  async close() {}
 
-  private async expireAt(key: string, expiration: number) { }
+  private async expireAt(key: string, expiration: number) {}
 
   async set(key: string, value: unknown, options?: StoreOption): Promise<void> {
     await this.setInternal(key, value, options);
