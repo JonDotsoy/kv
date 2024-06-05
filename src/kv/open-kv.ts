@@ -18,6 +18,9 @@ export class KV {
     return this.manager.close(...args);
   }
 
+  scan(...args: Parameters<ManagerDatabase["scan"]>) {
+    return this.manager.scan(...args);
+  }
   set(...args: Parameters<ManagerDatabase["set"]>) {
     return this.manager.set(...args);
   }

@@ -13,6 +13,14 @@ export type ManagerDatabase = {
   set(key: string, value: unknown, options?: StoreOptions): Promise<void>;
   delete(key: string): Promise<void>;
   get(key: string): Promise<unknown>;
+  scan(
+    cursor?: string,
+    match?: string,
+    count?: number,
+  ): Promise<{
+    continueCursor?: string;
+    values: { key: string; value: unknown }[];
+  }>;
 
   enqueue(
     channel: string,

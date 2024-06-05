@@ -113,6 +113,8 @@ export class MemoryStorage {
   expireAt(key: string, expirationAt: number) {}
 }
 
+const cursorByStore = new WeakMap<Store, string>();
+
 export class Memory implements ManagerDatabase {
   readonly channels = new Map<string, Set<string>>();
 
@@ -166,6 +168,39 @@ export class Memory implements ManagerDatabase {
   async get(key: string): Promise<unknown | null> {
     const store = this.store.get(key);
     return store?.value ?? null;
+  }
+
+  async scan(
+    cursor?: string | undefined,
+    match?: string | undefined,
+    count: number | undefined = 30,
+  ): Promise<{
+    continueCursor?: string | undefined;
+    values: { key: string; value: unknown }[];
+  }> {
+    let continueCursor: string | undefined = undefined;
+    let values: Store[] = [];
+    let c = cursor ? true : false;
+
+    for (const [key, store] of this.store.entries()) {
+      const matched = match ? key.match(match) : true;
+      if (c) {
+        if (cursor === key) {
+          c = false;
+        }
+        continue;
+      }
+      if (matched) values.push(store);
+      if (values.length >= count) {
+        continueCursor = store.id;
+        break;
+      }
+    }
+
+    return {
+      continueCursor,
+      values: Array.from(values, (value) => ({ key: value.id, value })),
+    };
   }
 
   private async lPush(key: string, value: unknown, options?: StoreOption) {

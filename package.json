@@ -35,6 +35,8 @@
     "zod": "^3.22.4"
   },
   "dependencies": {
+    "@jondotsoy/symbol.initialize": "^0.1.2",
+    "artur": "^1.2.1",
     "bull": "^4.12.2",
     "content-type": "^1.0.5",
     "redis": "^4.6.13",
