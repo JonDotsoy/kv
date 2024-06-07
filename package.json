@@ -35,6 +35,7 @@
     "zod": "^3.22.4"
   },
   "dependencies": {
+    "@jondotsoy/flags": "^2.0.3",
     "@jondotsoy/symbol.initialize": "^0.1.2",
     "artur": "^1.2.1",
     "bull": "^4.12.2",

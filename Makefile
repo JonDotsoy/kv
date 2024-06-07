@@ -1,3 +1,5 @@
+KV_BIN="kv"
+
 build: build@cjs build@esm build@types
 
 build@cjs:
@@ -15,3 +17,5 @@ build@types:
 	bunx tsc --project tsconfig.types.json --outDir ./lib/types/
 	echo '{ "type": "module" }' > ./lib/types/package.json
 
+compile:
+	bun build bin/cli.ts --compile --outfile ${KV_BIN}

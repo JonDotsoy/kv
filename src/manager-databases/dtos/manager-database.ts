@@ -1,3 +1,5 @@
+import type { ScanResult } from "../../dto/scan-result";
+
 export type StoreOptions = { ttl?: number };
 export type SubscribeOptions = { subId?: string; signal: AbortSignal };
 
@@ -13,14 +15,7 @@ export type ManagerDatabase = {
   set(key: string, value: unknown, options?: StoreOptions): Promise<void>;
   delete(key: string): Promise<void>;
   get(key: string): Promise<unknown>;
-  scan(
-    cursor?: string,
-    match?: string,
-    count?: number,
-  ): Promise<{
-    continueCursor?: string;
-    values: { key: string; value: unknown }[];
-  }>;
+  scan(cursor?: string, match?: string, count?: number): Promise<ScanResult>;
 
   enqueue(
     channel: string,
