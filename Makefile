@@ -1,11 +1,9 @@
 KV_BIN="kv"
 
-build: build@cjs build@esm build@types
+build: preparepkg build@esm build@types
 
-build@cjs:
-	rm -rf ./lib/cjs/
-	bunx tsc --project tsconfig.cjs.json --outDir ./lib/cjs/
-	echo '{ "type": "commonjs" }' > ./lib/cjs/package.json
+preparepkg:
+	echo "export const pkg = `cat package.json` as const;" > src/pkg.ts 
 
 build@esm:
 	rm -rf ./lib/esm/

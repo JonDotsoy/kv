@@ -30,7 +30,7 @@ export class RestAPI implements ManagerDatabase {
   #url: import("url").URL;
 
   constructor(url: { toString(): string } = new URL("http://127.0.0.1:45678")) {
-    this.#url = new URL(url);
+    this.#url = new URL(`${url}`);
   }
 
   async init(): Promise<void> {}
@@ -47,7 +47,7 @@ export class RestAPI implements ManagerDatabase {
     if (typeof value !== "string")
       throw new Error(`expected a string but receiuve a ${typeof value}`);
 
-    const request = new Request(new URL(`./kv/${key}`, this.#url), {
+    const request = new Request(new URL(`./kv/${key}`, this.#url.toString()), {
       method: "PUT",
       body: new TextEncoder().encode(value),
     });
@@ -59,7 +59,7 @@ export class RestAPI implements ManagerDatabase {
   }
 
   async delete(key: string): Promise<void> {
-    const request = new Request(new URL(`./kv/${key}`, this.#url), {
+    const request = new Request(new URL(`./kv/${key}`, this.#url.toString()), {
       method: "DELETE",
     });
 
@@ -70,7 +70,7 @@ export class RestAPI implements ManagerDatabase {
   }
 
   async get(key: string): Promise<unknown> {
-    const request = new Request(new URL(`./kv/${key}`, this.#url), {
+    const request = new Request(new URL(`./kv/${key}`, this.#url.toString()), {
       method: "GET",
     });
 
@@ -89,7 +89,7 @@ export class RestAPI implements ManagerDatabase {
     match?: string | undefined,
     count?: number | undefined,
   ): Promise<ScanResult> {
-    const request = new Request(new URL(`./kv`, this.#url), {
+    const request = new Request(new URL(`./kv`, this.#url.toString()), {
       method: "GET",
     });
 

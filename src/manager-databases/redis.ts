@@ -115,6 +115,17 @@ export class Redis implements ManagerDatabase {
     // this.keySubscription = `${this.prefix}:s`;
   }
 
+  scan(
+    cursor?: string | undefined,
+    match?: string | undefined,
+    count?: number | undefined,
+  ): Promise<{
+    values: { key: string; value?: unknown }[];
+    continueCursor?: string | undefined;
+  }> {
+    throw new Error("Method not implemented.");
+  }
+
   get client() {
     if (!this.#client) throw new Error(`Not connecter yet`);
     return this.#client;

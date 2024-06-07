@@ -7,7 +7,6 @@
     "allowImportingTsExtensions": false,
     "moduleResolution": "Bundler",
     "declaration": true,
-    "inlineSourceMap": true,
-    "rootDir": "./src/"
+    "inlineSourceMap": true
   }
 }

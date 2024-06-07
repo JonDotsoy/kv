@@ -11,6 +11,16 @@ type ObjectValue<T extends Record<string, any> = Record<string, any>> = {
 };
 
 export class Mongo implements ManagerDatabase {
+  scan(
+    cursor?: string | undefined,
+    match?: string | undefined,
+    count?: number | undefined,
+  ): Promise<{
+    values: { key: string; value?: unknown }[];
+    continueCursor?: string | undefined;
+  }> {
+    throw new Error("Method not implemented.");
+  }
   init(): Promise<void> {
     throw new Error("Method not implemented.");
   }

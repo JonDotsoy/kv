@@ -1,8 +1,7 @@
 import { Router, cors, params } from "artur";
-import { version } from "../../package.json";
 import { open } from "../kv/open-kv";
-import { Memory } from "../manager-databases/memory";
 import { SymbolInitialize } from "@jondotsoy/symbol.initialize";
+import { pkg } from "../pkg.js";
 
 const tryNumber = (value: string | null) => {
   if (value === null) return value;
@@ -22,7 +21,7 @@ export class Server {
     this.router.use("GET", "/", {
       fetch: () =>
         Response.json({
-          version,
+          version: pkg.version,
           serverTimeAlive: this.#serverTimeAlive
             ? Date.now() - this.#serverTimeAlive
             : null,

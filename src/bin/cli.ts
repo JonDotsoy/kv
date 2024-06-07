@@ -10,8 +10,8 @@ import {
   rule,
   type Rule,
 } from "@jondotsoy/flags";
-import { open } from "../src";
-import { RestAPI } from "../src/manager-databases/rest-api";
+import { open } from "../kv/open-kv.js";
+import { RestAPI } from "../manager-databases/rest-api.js";
 import { initialize } from "@jondotsoy/symbol.initialize";
 
 class FlagsError extends Error {
@@ -24,7 +24,7 @@ class FlagsError extends Error {
   }
 }
 
-const client = await open(new RestAPI());
+const pendingClient = await open(new RestAPI());
 
 type MainOptions = {
   set: string[];
@@ -101,7 +101,7 @@ const set = async (args: string[]) => {
       rules,
     );
 
-  await client.set(setOptions.key, setOptions.value);
+  await (await pendingClient).set(setOptions.key, setOptions.value);
 };
 
 const get = async (args: string[]) => {
@@ -119,7 +119,9 @@ const get = async (args: string[]) => {
   if (!getOptions.key)
     throw new FlagsError(`Missing key argument`, "kv get <key>", rules);
 
-  const value = (await client.get(getOptions.key)) ?? getOptions.defaultValue;
+  const value =
+    (await (await pendingClient).get(getOptions.key)) ??
+    getOptions.defaultValue;
 
   process.stdout.write(`${value}`);
   if (!getOptions.noNewLine) {
@@ -140,14 +142,14 @@ const del = async (args: string[]) => {
   if (!getOptions.key)
     throw new FlagsError(`Missing key argument`, "kv get <key>", rules);
 
-  await client.delete(getOptions.key);
+  await (await pendingClient).delete(getOptions.key);
 };
 
 const scan = async (args: string[]) => {
   const rules: Rule<ScanOptions>[] = [];
   const getOptions = flags<ScanOptions>(args, {}, rules);
 
-  const res = await client.scan();
+  const res = await (await pendingClient).scan();
   let index = 0;
   for (const e of res.values) {
     index += 1;
@@ -156,7 +158,7 @@ const scan = async (args: string[]) => {
   }
 };
 
-await main(process.argv.slice(2)).catch(async (err) => {
+main(process.argv.slice(2)).catch(async (err) => {
   await initialize(err);
   if (err instanceof FlagsError) {
     console.error(err.message);
