@@ -16,7 +16,7 @@ await kv.set("foo", "biz");
 await kv.get("foo"); // => "biz"
 await kv.set("tar", "zaz", { ttl: 100 });
 await setTimeout(200);
-await kv.get("tar"); // => Error: Cannot found foo
+await kv.get("tar"); // => null
 
 // Queue
 await kv.enqueue("foo");
@@ -42,3 +42,20 @@ Open-KV supports the following databases:
 - **Redis**: A popular open-source in-memory data store
 
 With Open-KV, you can easily switch between these two databases depending on your use case and requirements.
+
+## Client KV
+
+The Client KV command-line interface allows you to interact with your key-value store directly from the terminal. This can be particularly useful for quick testing and debugging.
+
+```shell
+# Set a key-value pair
+kv set foo biz
+
+# Get the value of a key
+kv get foo
+# Output: biz
+
+# Attempt to get a non-existent key
+kv get taz
+# Output: (empty)
+```
