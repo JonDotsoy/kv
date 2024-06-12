@@ -27,6 +27,9 @@ export class KV {
   delete(...args: Parameters<ManagerDatabase["delete"]>) {
     return this.manager.delete(...args);
   }
+  /**
+   * Return a method stored
+   */
   get(...args: Parameters<ManagerDatabase["get"]>) {
     return this.manager.get(...args);
   }
