@@ -11,7 +11,7 @@ import {
   type Rule,
 } from "@jondotsoy/flags";
 import { open } from "../kv/open-kv.js";
-import { RestAPI } from "../manager-databases/rest-api.js";
+import { File } from "../manager-databases/file.js";
 import { initialize } from "@jondotsoy/symbol.initialize";
 
 class FlagsError extends Error {
@@ -24,7 +24,11 @@ class FlagsError extends Error {
   }
 }
 
-const pendingClient = await open(new RestAPI());
+const HOME = process.env.HOME!;
+
+if (!HOME) throw new Error("HOME environment variable is not defined");
+
+const pendingClient = await open(new File(new URL(`${HOME}/.kv`, 'file:')));
 
 type MainOptions = {
   set: string[];
@@ -123,6 +127,7 @@ const get = async (args: string[]) => {
     (await (await pendingClient).get(getOptions.key)) ??
     getOptions.defaultValue;
 
+  if (!value) return;
   process.stdout.write(`${value}`);
   if (!getOptions.noNewLine) {
     process.stdout.write(`\n`);
