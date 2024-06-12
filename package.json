@@ -31,7 +31,7 @@
     "prettier": "^3.2.5",
     "typescript": "^5.4.5",
     "use-workspace": "^0.1.11",
-    "yaml": "^2.4.1",
+    "yaml": "^2.4.5",
     "zod": "^3.22.4"
   },
   "dependencies": {
