@@ -4,7 +4,6 @@
   "description": "A JS memory to Set/Get, Queues and Pub/Sub solutions",
   "license": "MIT",
   "module": "./lib/esm/index.js",
-  "main": "./lib/cjs/index.js",
   "type": "module",
   "typesVersions": {
     "*": {
@@ -15,8 +14,6 @@
   },
   "exports": {
     ".": {
-      "require": "./lib/cjs/index.js",
-      "node": "./lib/cjs/index.js",
       "types": "./lib/types/index.d.ts",
       "import": "./lib/esm/index.js",
       "default": "./lib/esm/index.js"

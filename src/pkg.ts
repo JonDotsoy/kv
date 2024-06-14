@@ -4,7 +4,6 @@ export const pkg = {
   description: "A JS memory to Set/Get, Queues and Pub/Sub solutions",
   license: "MIT",
   module: "./lib/esm/index.js",
-  main: "./lib/cjs/index.js",
   type: "module",
   typesVersions: {
     "*": {
@@ -13,8 +12,6 @@ export const pkg = {
   },
   exports: {
     ".": {
-      require: "./lib/cjs/index.js",
-      node: "./lib/cjs/index.js",
       types: "./lib/types/index.d.ts",
       import: "./lib/esm/index.js",
       default: "./lib/esm/index.js",
@@ -27,7 +24,7 @@ export const pkg = {
     prettier: "^3.2.5",
     typescript: "^5.4.5",
     "use-workspace": "^0.1.11",
-    yaml: "^2.4.1",
+    yaml: "^2.4.5",
     zod: "^3.22.4",
   },
   dependencies: {

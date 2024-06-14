@@ -13,6 +13,7 @@ import {
 import { open } from "../kv/open-kv.js";
 import { File } from "../manager-databases/file.js";
 import { initialize } from "@jondotsoy/symbol.initialize";
+import { createServer } from "../server/create-server.js";
 
 class FlagsError extends Error {
   constructor(
@@ -28,13 +29,14 @@ const HOME = process.env.HOME!;
 
 if (!HOME) throw new Error("HOME environment variable is not defined");
 
-const pendingClient = await open(new File(new URL(`${HOME}/.kv`, 'file:')));
+const client = await open(new File(new URL(`${HOME}/.kv`, "file:")));
 
 type MainOptions = {
   set: string[];
   get: string[];
   del: string[];
   scan: string[];
+  serve: string[];
 };
 
 type SetOptions = {
@@ -53,6 +55,10 @@ type DetOptions = {
   key: string;
 };
 
+type ServeOptions = {
+  port: number;
+};
+
 type ScanOptions = {};
 
 const main = async (args: string[]) => {
@@ -69,6 +75,9 @@ const main = async (args: string[]) => {
     rule(command("scan"), restArgumentsAt("scan"), {
       description: "scan every kets",
     }),
+    rule(command("serve"), restArgumentsAt("serve"), {
+      description: "scan every kets",
+    }),
   ];
   const options = flags<MainOptions>(args, {}, rules);
 
@@ -76,6 +85,7 @@ const main = async (args: string[]) => {
   if (options.get) return get(options.get);
   if (options.del) return del(options.del);
   if (options.scan) return scan(options.scan);
+  if (options.serve) return serve(options.serve);
 
   return console.log(makeHelpMessage("kv", rules, ["set foo biz", "get foo"]));
 };
@@ -105,7 +115,11 @@ const set = async (args: string[]) => {
       rules,
     );
 
-  await (await pendingClient).set(setOptions.key, setOptions.value);
+  await (
+    await client
+  ).set(setOptions.key, setOptions.value, {
+    ttl: setOptions.expire,
+  });
 };
 
 const get = async (args: string[]) => {
@@ -124,8 +138,7 @@ const get = async (args: string[]) => {
     throw new FlagsError(`Missing key argument`, "kv get <key>", rules);
 
   const value =
-    (await (await pendingClient).get(getOptions.key)) ??
-    getOptions.defaultValue;
+    (await (await client).get(getOptions.key)) ?? getOptions.defaultValue;
 
   if (!value) return;
   process.stdout.write(`${value}`);
@@ -147,20 +160,34 @@ const del = async (args: string[]) => {
   if (!getOptions.key)
     throw new FlagsError(`Missing key argument`, "kv get <key>", rules);
 
-  await (await pendingClient).delete(getOptions.key);
+  await (await client).delete(getOptions.key);
 };
 
 const scan = async (args: string[]) => {
   const rules: Rule<ScanOptions>[] = [];
   const getOptions = flags<ScanOptions>(args, {}, rules);
 
-  const res = await (await pendingClient).scan();
+  const res = await (await client).scan();
   let index = 0;
   for (const e of res.values) {
     index += 1;
 
     console.log(` ${e.key}: ${e.value}`);
   }
+};
+
+const serve = async (args: string[]) => {
+  const rules: Rule<ServeOptions>[] = [
+    rule(flag("-p", "--port"), isNumberAt("port")),
+  ];
+  const serveOptions = flags<ServeOptions>(args, {}, rules);
+
+  const server = await createServer({
+    manager: client,
+    port: serveOptions.port ?? 45678,
+  });
+
+  await server.listen();
 };
 
 main(process.argv.slice(2)).catch(async (err) => {
