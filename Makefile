@@ -4,7 +4,6 @@ build: preparepkg build@esm build@types
 
 preparepkg:
 	echo "export const pkg = `cat package.json` as const;" > src/pkg.ts
-	bunx prettier -w src/pkg.ts
 
 build@esm:
 	rm -rf ./lib/esm/

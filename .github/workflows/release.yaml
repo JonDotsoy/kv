@@ -14,11 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release-please.outputs.release_created }}
+      prs_created: ${{ steps.release-please.outputs.prs_created }}
+      pr: ${{ steps.release-please.outputs.pr }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release-please
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+        if: steps.release-please.outputs.prs_created
+        with:
+          ref: ${{ fromJSON(steps.release-please.outputs.pr).headBranchName }}
+      - if: steps.release-please.outputs.prs_created
+        run: |
+          make preparepkg
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/googleapis/release-please-action.git"
+          git checkout ${{ fromJSON(steps.release-please.outputs.pr).headBranchName }}
+          git add src/pkg.ts
+          git commit -n -m "change: upgrade src/pkg.ts file"
+          git push
 
   publish:
     runs-on: ubuntu-latest
