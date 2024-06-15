@@ -43,10 +43,15 @@
   },
   "scripts": {
     "prepack": "make build",
-    "fmt": "prettier -w ."
+    "fmt": "prettier -w .",
+    "lint": "prettier --check ."
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/JonDotsoy/kv.git"
-  }
+  },
+  "keywords": [
+    "kv",
+    "key-value"
+  ]
 }
