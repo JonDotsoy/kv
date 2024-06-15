@@ -1,6 +1,6 @@
 {
   "name": "@jondotsoy/open-kv",
-  "version": "v0.2.0",
+  "version": "0.3.0",
   "description": "A JS memory to Set/Get, Queues and Pub/Sub solutions",
   "license": "MIT",
   "module": "./lib/esm/index.js",
