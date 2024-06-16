@@ -3,7 +3,7 @@ KV_BIN="kv"
 build: preparepkg build@esm build@types
 
 preparepkg:
-	echo "export const pkg = `cat package.json` as const;" > src/pkg.ts
+	cat package.json | jq '"export const pkg = \({version:.version}) as const;"' -r > src/pkg.ts
 
 build@esm:
 	rm -rf ./lib/esm/
