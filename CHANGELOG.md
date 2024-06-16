@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/JonDotsoy/kv/compare/open-kv-v0.3.0...open-kv-v0.4.0) (2024-06-16)
+
+
+### Features
+
+* upgrade pkg.ts file ([7d34128](https://github.com/JonDotsoy/kv/commit/7d3412800f7c1a2771d327459132473f7ebf7aad))
+
+
+### Bug Fixes
+
+* return correct value on memory manager-database ([4d988ea](https://github.com/JonDotsoy/kv/commit/4d988ea1163372a249c217982402321f6dd62da4))
+
 ## [0.3.0](https://github.com/JonDotsoy/kv/compare/open-kv-v0.2.1...open-kv-v0.3.0) (2024-06-14)
 
 
