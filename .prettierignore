@@ -2,3 +2,4 @@ lib/
 .release-please-manifest.json
 release-please-config.json
 src/pkg.ts
+CHANGELOG.md

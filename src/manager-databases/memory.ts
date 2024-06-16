@@ -199,7 +199,10 @@ export class Memory implements ManagerDatabase {
 
     return {
       continueCursor,
-      values: Array.from(values, (value) => ({ key: value.id, value })),
+      values: Array.from(values, (value) => ({
+        key: value.id,
+        value: value.value,
+      })),
     };
   }
 
